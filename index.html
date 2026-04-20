@@ -9,19 +9,9 @@
 body {
     margin:0;
     font-family: Arial;
-    background: linear-gradient(135deg,#0d47a1,#001f3f);
+    background: linear-gradient(135deg,#0d47a1,#000);
     color:white;
     text-align:center;
-}
-
-/* animasi */
-.glow {
-    font-size:30px;
-    animation: glow 2s infinite alternate;
-}
-@keyframes glow {
-    from {text-shadow:0 0 10px cyan;}
-    to {text-shadow:0 0 30px cyan;}
 }
 
 .container {
@@ -29,61 +19,64 @@ body {
 }
 
 button {
-    padding:10px;
+    padding:10px 20px;
     margin:10px;
     border:none;
     border-radius:10px;
-    background:#00bfff;
+    background:#2196f3;
     color:white;
-    cursor:pointer;
+    font-weight:bold;
 }
 
 .box {
-    background:rgba(255,255,255,0.1);
-    margin:15px;
+    border:2px solid #00e5ff;
     padding:15px;
-    border-radius:15px;
-}
-
-.file {
-    background:rgba(0,0,0,0.4);
-    padding:10px;
     margin:10px;
     border-radius:10px;
+}
+
+.hidden { display:none; }
+
+.title {
+    font-size:30px;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow:0 0 10px #00e5ff; }
+    to { text-shadow:0 0 30px #00e5ff; }
 }
 </style>
 </head>
 
 <body>
 
-<div id="login" class="container">
-    <h1 class="glow">Krammz Lua</h1>
-    <p>Pilih Login</p>
-
-    <button onclick="login('owner')">Login Owner</button>
-    <button onclick="login('member')">Member Saluran</button>
+<div id="home" class="container">
+    <h1 class="title">Krammz Lua</h1>
+    <button onclick="showOwner()">Login Owner</button>
+    <button onclick="showMember()">Member Saluran</button>
 </div>
 
-<div id="password" class="container" style="display:none;">
-    <h2>Masukkan Password</h2>
-    <input type="password" id="pass">
-    <br>
-    <button onclick="checkPass()">Masuk</button>
+<!-- OWNER -->
+<div id="owner" class="container hidden">
+    <h2>OWNER PANEL</h2>
+    <input type="password" id="pass" placeholder="Masukkan Password">
+    <button onclick="login()">Login</button>
+
+    <div id="ownerPanel" class="hidden">
+        <h3>Upload Script Lua</h3>
+        <input type="file" id="fileInput" accept=".lua">
+        <button onclick="upload()">Upload</button>
+        <div id="ownerList"></div>
+    </div>
 </div>
 
-<div id="owner" class="container" style="display:none;">
-    <h1 class="glow">OWNER PANEL</h1>
+<!-- MEMBER -->
+<div id="member" class="container hidden">
+    <h2 class="title">Welcome Member Krammz Lua 😎</h2>
+    <p>Krammz Lua yang ganteng baik suka cheat GTA</p>
 
-    <input type="file" id="fileInput">
-    <br>
-    <button onclick="upload()">Upload File</button>
-
-    <div id="ownerFiles"></div>
-</div>
-
-<div id="member" class="container" style="display:none;">
-    <h1 class="glow">WELCOME MEMBER</h1>
-    <p>Welcome Member Krammz Lua Yang Ganteng Baik Suka Cheat GTA 😈</p>
+    <button onclick="join()">Join Saluran</button>
 
     <div class="box">
         Total Kunjungan: <span id="visit"></span>
@@ -93,89 +86,86 @@ button {
         Total Script: <span id="totalScript"></span>
     </div>
 
-    <button onclick="join()">Join Saluran</button>
-
-    <h2>List Script</h2>
-    <div id="memberFiles"></div>
+    <div id="fileList"></div>
 </div>
 
 <script>
-let role = "";
+let visits = localStorage.getItem("visits") || 0;
+visits++;
+localStorage.setItem("visits", visits);
 
-// login
-function login(r){
-    role = r;
-    document.getElementById("login").style.display="none";
-    document.getElementById("password").style.display="block";
+document.getElementById("visit").innerText = visits;
+
+function showOwner(){
+    hideAll();
+    document.getElementById("owner").classList.remove("hidden");
 }
 
-// password
-function checkPass(){
-    let p = document.getElementById("pass").value;
+function showMember(){
+    hideAll();
+    document.getElementById("member").classList.remove("hidden");
+    loadFiles();
+}
 
-    if(p === "krammzluacc"){
-        document.getElementById("password").style.display="none";
+function hideAll(){
+    document.getElementById("home").classList.add("hidden");
+    document.getElementById("owner").classList.add("hidden");
+    document.getElementById("member").classList.add("hidden");
+}
 
-        if(role === "owner"){
-            document.getElementById("owner").style.display="block";
-            loadOwner();
-        } else {
-            document.getElementById("member").style.display="block";
-            loadMember();
-        }
+function login(){
+    let pass = document.getElementById("pass").value;
+    if(pass === "121"){
+        document.getElementById("ownerPanel").classList.remove("hidden");
+        loadOwner();
     } else {
         alert("Password salah!");
     }
 }
 
-// upload (owner)
 function upload(){
     let input = document.getElementById("fileInput");
-    if(input.files.length === 0) return alert("Pilih file!");
+    if(input.files.length == 0) return;
 
     let file = input.files[0];
-    let data = JSON.parse(localStorage.getItem("files") || "[]");
 
-    data.push(file.name);
+    let data = JSON.parse(localStorage.getItem("files") || "[]");
+    data.push({
+        name: file.name,
+        size: (file.size/1024).toFixed(2) + " KB"
+    });
+
     localStorage.setItem("files", JSON.stringify(data));
 
     loadOwner();
 }
 
-// load owner
 function loadOwner(){
+    let list = document.getElementById("ownerList");
     let data = JSON.parse(localStorage.getItem("files") || "[]");
-    let div = document.getElementById("ownerFiles");
-    div.innerHTML="";
 
+    list.innerHTML = "";
     data.forEach(f=>{
-        div.innerHTML += `<div class="file">${f}</div>`;
+        list.innerHTML += `<div class="box">${f.name} (${f.size})</div>`;
     });
 }
 
-// load member
-function loadMember(){
+function loadFiles(){
+    let list = document.getElementById("fileList");
+    let total = document.getElementById("totalScript");
+
     let data = JSON.parse(localStorage.getItem("files") || "[]");
 
-    let div = document.getElementById("memberFiles");
-    div.innerHTML="";
+    total.innerText = data.length;
 
+    list.innerHTML = "";
     data.forEach(f=>{
-        div.innerHTML += `<div class="file">${f}</div>`;
+        list.innerHTML += `<div class="box">${f.name} (${f.size})</div>`;
     });
-
-    document.getElementById("totalScript").innerText = data.length;
-
-    // visit counter
-    let v = localStorage.getItem("visit") || 0;
-    v++;
-    localStorage.setItem("visit", v);
-    document.getElementById("visit").innerText = v;
 }
 
-// join WA
 function join(){
-    window.location.href="https://whatsapp.com/channel/0029Vb1emh39Gv7QRTZwp02u";
+    window.location.href = "https://whatsapp.com/channel/0029Vb1emh39Gv7QRTZwp02u";
 }
 </script>
 
