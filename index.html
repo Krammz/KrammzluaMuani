@@ -3,76 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Welcome Guysss</title>
+<title>Krammz Lua</title>
 
 <style>
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #0d47a1, #000);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
+    margin:0;
+    font-family: Arial;
+    background: linear-gradient(135deg,#0d47a1,#000);
+    color:white;
+    text-align:center;
 }
 
-/* Container */
 .container {
-    animation: fadeIn 2s ease-in-out;
+    padding:20px;
 }
 
-/* Animasi teks */
+button {
+    padding:10px 20px;
+    margin:10px;
+    border:none;
+    border-radius:10px;
+    background:#2196f3;
+    color:white;
+    font-weight:bold;
+}
+
+.box {
+    border:2px solid #00e5ff;
+    padding:15px;
+    margin:10px;
+    border-radius:10px;
+}
+
+.hidden { display:none; }
+
 .title {
-    font-size: 40px;
-    font-weight: bold;
+    font-size:30px;
     animation: glow 2s infinite alternate;
 }
 
-.subtitle {
-    font-size: 18px;
-    margin-top: 10px;
-    opacity: 0.8;
-}
-
-/* Tombol */
-button {
-    margin-top: 20px;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 10px;
-    background: #00bfff;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #009acd;
-}
-
-/* Animasi */
 @keyframes glow {
-    from { text-shadow: 0 0 10px #00e5ff; }
-    to { text-shadow: 0 0 30px #00e5ff, 0 0 60px #00e5ff; }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { text-shadow:0 0 10px #00e5ff; }
+    to { text-shadow:0 0 30px #00e5ff; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <div class="title">Welcome Guysss 😎</div>
-    <div class="subtitle">Selamat datang di website Krammz Lua</div>
-    
-    <button onclick="alert('Halo Bang 😎🔥')">Klik Disini</button>
+<div id="home" class="container">
+    <h1 class="title">Krammz Lua</h1>
+    <button onclick="showOwner()">Login Owner</button>
+    <button onclick="showMember()">Member Saluran</button>
 </div>
+
+<!-- OWNER -->
+<div id="owner" class="container hidden">
+    <h2>OWNER PANEL</h2>
+    <input type="password" id="pass" placeholder="Masukkan Password">
+    <button onclick="login()">Login</button>
+
+    <div id="ownerPanel" class="hidden">
+        <h3>Upload Script Lua</h3>
+        <input type="file" id="fileInput" accept=".lua">
+        <button onclick="upload()">Upload</button>
+        <div id="ownerList"></div>
+    </div>
+</div>
+
+<!-- MEMBER -->
+<div id="member" class="container hidden">
+    <h2 class="title">Welcome Member Krammz Lua 😎</h2>
+    <p>Krammz Lua yang ganteng baik suka cheat GTA</p>
+
+    <button onclick="join()">Join Saluran</button>
+
+    <div class="box">
+        Total Kunjungan: <span id="visit"></span>
+    </div>
+
+    <div class="box">
+        Total Script: <span id="totalScript"></span>
+    </div>
+
+    <div id="fileList"></div>
+</div>
+
+<script>
+let visits = localStorage.getItem("visits") || 0;
+visits++;
+localStorage.setItem("visits", visits);
+
+document.getElementById("visit").innerText = visits;
+
+function showOwner(){
+    hideAll();
+    document.getElementById("owner").classList.remove("hidden");
+}
+
+function showMember(){
+    hideAll();
+    document.getElementById("member").classList.remove("hidden");
+    loadFiles();
+}
+
+function hideAll(){
+    document.getElementById("home").classList.add("hidden");
+    document.getElementById("owner").classList.add("hidden");
+    document.getElementById("member").classList.add("hidden");
+}
+
+function login(){
+    let pass = document.getElementById("pass").value;
+    if(pass === "121"){
+        document.getElementById("ownerPanel").classList.remove("hidden");
+        loadOwner();
+    } else {
+        alert("Password salah!");
+    }
+}
+
+function upload(){
+    let input = document.getElementById("fileInput");
+    if(input.files.length == 0) return;
+
+    let file = input.files[0];
+
+    let data = JSON.parse(localStorage.getItem("files") || "[]");
+    data.push({
+        name: file.name,
+        size: (file.size/1024).toFixed(2) + " KB"
+    });
+
+    localStorage.setItem("files", JSON.stringify(data));
+
+    loadOwner();
+}
+
+function loadOwner(){
+    let list = document.getElementById("ownerList");
+    let data = JSON.parse(localStorage.getItem("files") || "[]");
+
+    list.innerHTML = "";
+    data.forEach(f=>{
+        list.innerHTML += `<div class="box">${f.name} (${f.size})</div>`;
+    });
+}
+
+function loadFiles(){
+    let list = document.getElementById("fileList");
+    let total = document.getElementById("totalScript");
+
+    let data = JSON.parse(localStorage.getItem("files") || "[]");
+
+    total.innerText = data.length;
+
+    list.innerHTML = "";
+    data.forEach(f=>{
+        list.innerHTML += `<div class="box">${f.name} (${f.size})</div>`;
+    });
+}
+
+function join(){
+    window.location.href = "https://whatsapp.com/channel/0029Vb1emh39Gv7QRTZwp02u";
+}
+</script>
 
 </body>
 </html>
