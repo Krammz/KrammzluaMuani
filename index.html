@@ -728,7 +728,7 @@
             background: linear-gradient(180deg, #87cefa, #1e90ff, #00bfff);
         }
 
-        /*Footer Style */
+        /* Footer Style */
         .footer-note {
             text-align: center;
             margin-top: 20px;
@@ -834,6 +834,45 @@ body {
 .saluran-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 0 20px yellow, 0 0 40px gold;
+}
+
+/* ZEUS BACKGROUND */
+body {
+    background: radial-gradient(circle at center, #001f3f, #000814) !important;
+    overflow-x: hidden;
+}
+
+/* Zeus image layer */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://i.ibb.co/4pDNDk1/zeus-lightning.png') center/contain no-repeat;
+    opacity: 0.15;
+    animation: zeusMove 6s ease-in-out infinite alternate;
+    z-index: -1;
+}
+
+/* floating + lightning movement */
+@keyframes zeusMove {
+    0% { transform: translateY(0px) scale(1); filter: brightness(1); }
+    50% { transform: translateY(-20px) scale(1.05); filter: brightness(1.5); }
+    100% { transform: translateY(10px) scale(1); filter: brightness(1); }
+}
+
+/* lightning flash overlay */
+body::before {
+    animation: lightningFlash 4s infinite;
+}
+
+@keyframes lightningFlash {
+    0%, 90%, 100% { opacity: 0; }
+    92% { opacity: 0.3; }
+    94% { opacity: 0; }
+    96% { opacity: 0.5; }
 }
 </style>
 </head>
