@@ -756,14 +756,47 @@
 body::before {
     background: linear-gradient(135deg, #001f3f, #003366, #004080, #001f3f);
 }
+
+body {
+    background: #ffffff !important;
+}
+
+/* Matrix canvas */
+#matrixCanvas {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:-1;
+}
+
+/* Zeus lightning stroke text */
+.zeus-text {
+    font-size: 32px;
+    font-weight: bold;
+    text-align:center;
+    color: #0a0a0a;
+    text-shadow: 
+        0 0 5px #00bfff,
+        0 0 10px #00bfff,
+        0 0 20px #1e90ff,
+        0 0 40px #1e90ff;
+    animation: lightning 1.5s infinite alternate;
+}
+
+@keyframes lightning {
+    from { text-shadow: 0 0 5px #00bfff; }
+    to { text-shadow: 0 0 25px #1e90ff, 0 0 50px #00bfff; }
+}
 </style>
 </head>
-<body>
+<body><canvas id="matrixCanvas"></canvas>
 <div class="container">
 <!-- Discord Header with Pink -->
 <div class="header">
 <div class="header-icon">🔍</div>
-<div class="header-title">
+<div class="header-title"><div class="zeus-text">KRAMMZLUA</div>
 <h1>Scan Keylogger</h1>
 <p>buat cek file lua</p>
 </div>
@@ -1180,17 +1213,6 @@ body::before {
             a.click();
         }
 
-        function resetScanner() {
-            currentFiles = [];
-            scannedFiles = [];
-            detectedWebhooks = [];
-            results.classList.remove('active');
-            scanBtn.disabled = true;
-            uploadArea.querySelector('.upload-text').textContent = 'Seret file kesini atau klik untuk upload';
-            uploadArea.querySelector('.upload-hint').textContent = 'Format: .lua .txt | Maks: 5MB';
-            fileInput.value = '';
-        }
-
         function showDetails(fileIndex) {
             const modal = document.getElementById('modal');
             const modalBody = document.getElementById('modalBody');
@@ -1245,5 +1267,38 @@ body::before {
             document.getElementById('modal').classList.remove('active');
         }
     </script>
-</body>
+<script>
+const canvas = document.getElementById('matrixCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
+
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+
+const drops = [];
+for(let x=0;x<columns;x++) drops[x]=1;
+
+function draw(){
+    ctx.fillStyle = "rgba(255,255,255,0.05)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = "#00bfff";
+    ctx.font = fontSize + "px monospace";
+
+    for(let i=0;i<drops.length;i++){
+        const text = letters[Math.floor(Math.random()*letters.length)];
+        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+
+        if(drops[i]*fontSize > canvas.height && Math.random()>0.975)
+            drops[i]=0;
+
+        drops[i]++;
+    }
+}
+
+setInterval(draw,33);
+</script></body>
 </html>
